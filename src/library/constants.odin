@@ -24,8 +24,8 @@ EXAMPLE_DB_PATH :: "./example.chunky"
 //DB header shit
 MAGIC_NUMBER :string: "CHUNKDB_V1"
 VERSION :u32: 1
-DEFAULT_DB_CAPACITY :u64: 512_000 //500kb this includes pre-allocated chunks
-MAX_DB_CAPACITY :u64: 5_242_880 //5mb. User cannot allocate anymore
+DEFAULT_DB_CAPACITY :u32: 512_000 //500kb this includes pre-allocated chunks
+MAX_DB_CAPACITY :u32: 5_242_880 //5mb. User cannot allocate anymore
 
 
 //Reocrd Field Type constants

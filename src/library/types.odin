@@ -23,9 +23,9 @@ package library
 DatabaseHeader :: struct{
     magicNumber: []u8, //versioning like: "CHUNKDB_V1"
     version: [4]u8,
-    sizePreAllocated: u32, // Size of all pre-allocated overhead (headers, indexes, etc.)
-    totalCapacity: u64,
-    usedBytes: u64,
+    sizePreAllocated: u32, // Size of all pre-allocated overhead (headers, indexes, etc.) DOES NOT include data chunks
+    totalCapacity: [4]u8,
+    usedBytes: [4]u8,
     createdAt: [8]u8,
     lastModifiedAt: [8]u8
 }
