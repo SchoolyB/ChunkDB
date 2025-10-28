@@ -2,19 +2,13 @@ package main
 import "core:fmt"
 import lib"../src/library"
 import "../src/core/codec"
-
+import "../src/core/data"
 
 main :: proc() {
-    foo:= codec.serialize_u64(256)
-    goob:= codec.deserialize_to_u64(foo)
 
-    // bar:= codec.serialize_u32(1020)
-    // baz:= codec.serialize_f64(420.69)
-
-    fmt.println("FOO: ", foo)
-    // fmt.println("BAR: ", bar)
-    // fmt.println("BAZ: ", baz)
-    fmt.println("GOOB: ", goob)
+    //Example field creation
+    age:u64=30
+    ageBytes:=codec.serialize_u64(age)
+    field:= data.make_new_field("user_age" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
+    fmt.println("Created Byte Code of Field: " ,field)
 }
-
-
