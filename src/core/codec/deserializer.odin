@@ -54,27 +54,35 @@ deserialize_to_string :: proc(val: []u8) -> string{
     return transmute(string)val
 }
 
+deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
+      header: lib.DatabaseHeader
 
-deserialize_db_header ::proc(b:[]u8) -> lib.DatabaseHeader{
-    header: lib.DatabaseHeader
+    // min size of the file header will be 58: 10 + 4 + 4 + 8 + 8 + sizePreAllocated + usedBytes
+      if len(b) < 34 { //TODO: Set this to 34 for the time being until I work on allocations. When done set to 58
+          return header
+      }
 
-    if len(b) > 0{
-        arr:[dynamic]u8
-        nByte:u8
+      offset := 0
 
-        //first 10 bytes are going to always be magic number
-        magicNum :[10]u8= {b[0], b[1], b[2],b[3],b[4],b[5],b[6],b[7],b[8], b[9]}
-        for n in magicNum {
-            nByte =  deserialize_to_u8(n)
-            append(&arr, nByte)
-        }
+      //First 10 bytes are magic nums
+      header.magicNumber = b[offset:offset+10] //Starting at 0 get 10 bytes [0,1,2,3,4,5,6,7,8,9]
+      offset += 10
 
-        // next
+      //next 4 are version
+      copy(header.version[:], b[offset:offset+4]) //starting at 10 get next 4 bytes [10,11,12,13]
+      offset += 4
 
-        header.magicNumber = arr[:]
+      // next 4 are total file capacity
+      copy(header.totalCapacity[:], b[offset:offset+4])
+      offset += 4
 
+      //next 8 are creattion time in nanoseconds
+      copy(header.createdAt[:], b[offset:offset+8])
+      offset += 8
 
-    }
+      //next 8 are last modified time in nanoseconds
+      copy(header.lastModifiedAt[:], b[offset:offset+8])
+      offset += 8
 
-    return header
-}
+      return header
+  }
