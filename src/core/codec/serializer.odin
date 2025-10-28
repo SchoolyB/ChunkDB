@@ -63,16 +63,21 @@ serialize_string:: proc(val: string) -> []u8{
 serialize_db_header :: proc(header: lib.DatabaseHeader ) -> []u8{
     result: [dynamic]u8
 
-    //Append first 10 bytes
+    //Append first 10 bytes for magic number
     append(&result, ..header.magicNumber) //[67, 72, 85, 78, 75, 68, 66, 95, 86, 49]
 
 
-    //append next 8
+    //append 4 bytes for version
+    for h in header.version{
+        append(&result, h)
+    }
+
+    //append 8 bytes for nanosecond time created
     for i in header.createdAt{
         append(&result, i)
     }
 
-    // append next 8
+    // append 8 bytes for nanosecond time created
     for j in header.lastModifiedAt{
         append(&result, j)
     }

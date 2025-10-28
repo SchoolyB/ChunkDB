@@ -58,15 +58,23 @@ deserialize_to_string :: proc(val: []u8) -> string{
 deserialize_db_header ::proc(b:[]u8) -> lib.DatabaseHeader{
     header: lib.DatabaseHeader
 
-    //first 10 bytes are going to always be magic number
-    magicNum :[10]u8= {b[0], b[1], b[2],b[3],b[4],b[5],b[6],b[7],b[8], b[9]}
-    nByte:u8
-    arr:[dynamic]u8
-    for n in magicNum {
-       nByte =  deserialize_to_u8(n)
-       append(&arr, nByte)
+    if len(b) > 0{
+        arr:[dynamic]u8
+        nByte:u8
+
+        //first 10 bytes are going to always be magic number
+        magicNum :[10]u8= {b[0], b[1], b[2],b[3],b[4],b[5],b[6],b[7],b[8], b[9]}
+        for n in magicNum {
+            nByte =  deserialize_to_u8(n)
+            append(&arr, nByte)
+        }
+
+        // next
+
+        header.magicNumber = arr[:]
+
+
     }
 
-    header.magicNumber = arr[:]
     return header
 }

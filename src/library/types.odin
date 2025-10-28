@@ -22,7 +22,7 @@ package library
 *************************************************************************/
 DatabaseHeader :: struct{
     magicNumber: []u8, //versioning like: "CHUNKDB_V1"
-    version: u32,
+    version: [4]u8,
     sizePreAllocated: u32, // Size of all pre-allocated overhead (headers, indexes, etc.)
     totalCapacity: u64,
     usedBytes: u64,
