@@ -1,13 +1,13 @@
 package library
 
-DatbaseHeader :: struct{
+DatabaseHeader :: struct{
     magicNumber: []u8, //versioning like: "CHUNKDB_V1"
     version: u32,
     sizePreAllocated: u32, // Size of all pre-allocated overhead (headers, indexes, etc.)
     totalCapacity: u64,
     usedBytes: u64,
-    createdAt: u64,
-    lastModifiedAt: u64
+    createdAt: [8]u8,
+    lastModifiedAt: [8]u8
 }
 
 ChunkHeader  :: struct {
@@ -38,3 +38,4 @@ Record :: struct {
     fields: [dynamic]Field
 }
 
+// Projects(Regions) -> Collections(Databases)->Cluster(Records)->Records(Fields)

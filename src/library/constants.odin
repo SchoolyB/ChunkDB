@@ -1,5 +1,7 @@
 package library
 
+EXAMPLE_DB_PATH :: "./example.chunky"
+
 //DB header shit
 MAGIC_NUMBER :string: "CHUNKDB_V1"
 VERSION :[4]u8: 1
