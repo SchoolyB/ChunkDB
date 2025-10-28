@@ -1,7 +1,7 @@
 package library
 
 DatbaseHeader :: struct{
-    magicNumber: [10]u8, //versioning like: "CHUNKDB_V1"
+    magicNumber: []u8, //versioning like: "CHUNKDB_V1"
     version: u32,
     sizePreAllocated: u32, // Size of all pre-allocated overhead (headers, indexes, etc.)
     totalCapacity: u64,
@@ -38,14 +38,3 @@ Record :: struct {
     fields: [dynamic]Field
 }
 
-
-FIELD_TYPE :: enum {
-    NULL = 0,
-    CHAR,
-    INTEGER,
-    FLOAT,
-    STRING,
-    DATE,
-    UUID,
-    ARRAY //similar to ostrichdb but arrays are just arrays
-}
