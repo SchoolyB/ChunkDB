@@ -1,6 +1,9 @@
 # ChunkDB - Architecture Design
 
-
+Ideal Record field storage format:
+```
+[nameLength prefix = 2 bytes][name = n bytes ][type = 1 byte][valueLength 4 bytes][value = n bytes]
+```
 ---
 
 ## Core Philosophy
