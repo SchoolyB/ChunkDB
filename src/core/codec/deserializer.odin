@@ -20,3 +20,7 @@ deserialize_to_u8 :: proc(val:[1]u8) -> u8 {
 deserialize_to_f64 :: proc(val:[8]u8) -> f64{
     return transmute(f64)val
 }
+
+deserialize_to_string :: proc(val: []u8) -> string{
+    return transmute(string)val
+}

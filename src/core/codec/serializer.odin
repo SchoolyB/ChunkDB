@@ -20,3 +20,7 @@ serialize_u8 :: proc(val: u8) -> [1]u8 {
 serialize_f64 :: proc(val: f64) -> [8]u8{
     return transmute([8]u8)val
 }
+
+serialize_string:: proc(val: string) -> []u8{
+    return transmute([]u8)val
+}
