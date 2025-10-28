@@ -1,6 +1,27 @@
 package codec
-import "core:encoding/endian"
+
 import lib"../../library"
+import "core:encoding/endian"
+/*************************************************************************
+* Author: Marshall A Burns
+* GitHub: @SchoolyB
+* Date: 27 October 2025
+* Copyright 2025-Present Marshall A. Burns
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* File Description: Contains logic for serializing in memory data into valid ChunkDB data(bytecode)
+*************************************************************************/
 
 // ????
 serialize_u16_big_E :: proc(val: u16) -> [2]u8{
@@ -39,6 +60,26 @@ serialize_string:: proc(val: string) -> []u8{
     return transmute([]u8)val
 }
 
+serialize_db_header :: proc(header: lib.DatabaseHeader ) -> []u8{
+    result: [dynamic]u8
+
+    //Append first 10 bytes
+    append(&result, ..header.magicNumber) //[67, 72, 85, 78, 75, 68, 66, 95, 86, 49]
+
+
+    //append next 8
+    for i in header.createdAt{
+        append(&result, i)
+    }
+
+    // append next 8
+    for j in header.lastModifiedAt{
+        append(&result, j)
+    }
+
+    return result[:]
+}
+
 //Helper that gets the prefix of a field name and returns the 2 byte representation
 // TODO: Move me somewhere else???
 @(require_results)
@@ -47,7 +88,6 @@ get_field_name_prefix :: proc(val: string) ->[2]u8 {
     return serialize_u16(result)
 }
 
-//Todo: move me too?
 @(require_results)
 serialize_field :: proc(f: lib.Field) -> []u8{
     result: [dynamic]u8
