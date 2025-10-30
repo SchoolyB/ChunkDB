@@ -3,6 +3,7 @@ package codec
 import "core:fmt"
 import "core:bytes"
 import "core:slice"
+import "core:path/filepath"
 import lib"../../library"
 /*************************************************************************
 * Author: Marshall A Burns
@@ -66,50 +67,68 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
       offset := 0
 
       //First 10 bytes are magic nums
-      header.magicNumber = b[offset:offset+10] //Starting at 0 get 10 bytes [0,1,2,3,4,5,6,7,8,9]
+      copy(header.magicNumber[:], b[offset:offset+10]) //Starting at 0 get 10 bytes [0,1,2,3,4,5,6,7,8,9]
       offset += 10
 
       //next 4 are version
-      copy(header.version[:], b[offset:offset+4]) //starting at 10 get next 4 bytes [10,11,12,13]
+      versionBytes: [4]u8
+      free(&versionBytes)
+      copy(versionBytes[:], b[offset:offset+4]) //starting at 10 get next 4 bytes [10,11,12,13]
+      header.version = deserialize_to_u32(versionBytes)
       offset += 4
 
       // next 4 are total file capacity
-      copy(header.totalCapacity[:], b[offset:offset+4])
+      capacityBytes: [4]u8
+      copy(capacityBytes[:], b[offset:offset+4])
+      header.totalCapacity = deserialize_to_u32(capacityBytes)
       offset += 4
 
       //next 8 are creattion time in nanoseconds
-      copy(header.createdAt[:], b[offset:offset+8])
+      createdAtBytes: [8]u8
+      copy(createdAtBytes[:], b[offset:offset+8])
+      header.createdAt = deserialize_to_u64(createdAtBytes)
       offset += 8
 
       //next 8 are last modified time in nanoseconds
-      copy(header.lastModifiedAt[:], b[offset:offset+8])
+      modifiedAtBytes: [8]u8
+      copy(modifiedAtBytes[:], b[offset:offset+8])
+      header.lastModifiedAt = deserialize_to_u64(modifiedAtBytes)
       offset += 8
 
       return header
   }
 
+  //Fucking voodoo man
   deserialize_to_field :: proc(b:[]u8) -> lib.Field{
       field: lib.Field
 
       offset:= 0
 
-        // grab the first byte
-       copy(field.nameLength[:], b[offset:offset+1])
+        // grab the first byte which is always the field's name len prefix
+       field.nameLength = b[offset]
        offset += 1
 
        //Jump to second byte which will ALWAYS be the start of the field's name
-       //Fucking VOODOO
-       firstByteVal:int
-       for v in field.nameLength{
-           firstByteVal = int(v)
-       }
+       fieldNameLenAsInt := int(field.nameLength)
+       field.name = deserialize_to_string(b[1:1+fieldNameLenAsInt])
+       offset += fieldNameLenAsInt
 
-       field.name = b[1:1+firstByteVal]
-       fmt.println(field.name)
+       //grab the next byte which will always be the field's 'type' byte
+       field.type = b[offset]
+       offset += 1
 
-       //TODO: Continue
+        //read the value length (should be 4 bytes since value len struct stores as 'u32')
+        // to determine how many bytes the actual value occupies
+       valueLengthBytes: [4]u8
+       copy(valueLengthBytes[:], b[offset:offset + 4])
+       field.valueLength = deserialize_to_u32(valueLengthBytes)
+       offset += size_of(field.valueLength)
 
-
+        //Since We know the length of the value,
+        // Make a new slice of that exact size and copy to it
+        valueBytes := make([]u8, field.valueLength)
+        copy(valueBytes[:], b[offset:offset + int(field.valueLength)])
+        field.value = valueBytes
 
       return field
   }

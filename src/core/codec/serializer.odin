@@ -63,32 +63,30 @@ serialize_string:: proc(val: string) -> []u8{
 
 serialize_db_header :: proc(header: lib.DatabaseHeader ) -> []u8{
     result: [dynamic]u8
-    buf: u8 = ---
+    b: u8 = ---
 
     //Append first 10 bytes for magic number
-    append(&result, ..header.magicNumber) //[67, 72, 85, 78, 75, 68, 66, 95, 86, 49]
+    for b in header.magicNumber{
+        append(&result, b) //[67, 72, 85, 78, 75, 68, 66, 95, 86, 49]
+    }
 
     //append 4 bytes for version
-    for buf in header.version{
-        append(&result, buf) // [1, 0, 0, 0,]
-    }
+    versionBytes:= serialize_u32(header.version)
+    append(&result, ..versionBytes[:]) // [1, 0, 0, 0,]
 
     //append bytes for total capacity
-    for buf in header.totalCapacity{
-        append(&result, buf)
-    }
+    capacityBytes:= serialize_u32(header.totalCapacity)
+    append(&result, ..capacityBytes[:])
 
     //TODO: missing bytes used AND  sizePreAllocated
 
     //append 8 bytes for nanosecond time created
-    for buf in header.createdAt{
-        append(&result, buf)
-    }
+    createdAtBytes:= serialize_u64(header.createdAt)
+    append(&result, ..createdAtBytes[:])
 
     // append 8 bytes for nanosecond time created
-    for buf in header.lastModifiedAt{
-        append(&result, buf)
-    }
+    lastModifiedBytes := serialize_u64(header.lastModifiedAt)
+    append(&result, ..lastModifiedBytes[:])
 
     return result[:]
 }
@@ -104,20 +102,24 @@ get_field_name_prefix :: proc(val: string) ->[2]u8 {
 @(require_results)
 serialize_field :: proc(f: lib.Field) -> []u8{
     result: [dynamic]u8
+    b:u8=---
 
     //append the SINGLE name length byte prefix
-    // nameLenBytes := serialize_u16(f.nameLength)
-    append(&result, f.nameLength[0])
+    nameLenByte := serialize_u8(f.nameLength)
+    append(&result, ..nameLenByte[:])
 
      //and the name bytes representation  itself
-     append(&result, ..f.name)
+     nameBytes:= serialize_string(f.name)
+     append(&result, ..nameBytes[:])
 
     //add the type byte if its an array make sure to user proper
-    typeByte := serialize_u8(f.type)
-    append(&result, typeByte[0])
+    typeByte:= serialize_u8(f.type)
+    append(&result, ..typeByte[:])
+
 
      //add 4 value len bytes
-     append(&result, f.valueLength[0], f.valueLength[1], f.valueLength[2], f.valueLength[3])
+     valLenBytes:= serialize_u32(f.valueLength)
+     append(&result, ..valLenBytes[:])
 
     // Add value bytes representation
     append(&result, ..f.value)
