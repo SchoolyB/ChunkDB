@@ -21,13 +21,13 @@ package library
 * File Description: Contains Structs, Enums, and Maps used throughout codebase
 *************************************************************************/
 DatabaseHeader :: struct{
-    magicNumber: []u8, //versioning like: "CHUNKDB_V1"
-    version: [4]u8,
+    magicNumber: [10]u8, //versioning like: "CHUNKDB_V1"
+    version: u32,
     sizePreAllocated: u32, // Size of all pre-allocated overhead (headers, indexes, etc.) DOES NOT include data chunks
-    totalCapacity: [4]u8,
-    usedBytes: [4]u8,
-    createdAt: [8]u8,
-    lastModifiedAt: [8]u8
+    totalCapacity: u32,
+    usedBytes: u32,
+    createdAt: u64,
+    lastModifiedAt: u64
 }
 
 IndexFile:: struct {
@@ -49,10 +49,10 @@ DataChunk :: struct {
 
 // Represents a single field within a record (name-type-value triple)
 Field :: struct {
-    nameLength: [1]u8,
-    name: []u8,
+    nameLength: u8,
+    name: string,
     type: u8,
-    valueLength: [4]u8, //keeping this 4bytes
+    valueLength: u32, //keeping this 4bytes
     value: []u8,
 }
 
@@ -61,5 +61,3 @@ Record :: struct {
     id: u8,
     fields: [dynamic]Field
 }
-
-// Projects(Regions) -> Collections(Databases)->Cluster(Records)->Records(Fields)
