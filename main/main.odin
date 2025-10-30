@@ -39,9 +39,11 @@ main :: proc() {
     // fmt.println(magicNumBytes)
 
 
-    // //Header creation(in mem), serialization, write to disk
+    //Header creation(in mem), serialization, write to disk
     // header:= data.make_new_db_header()
-    // make_db_file(lib.EXAMPLE_DB_PATH)
+    // serializdHeader:= codec.serialize_db_header(header)
+    // deserializedHeader:= codec.deserialize_db_header(serializdHeader)
+    // lib.make_db_file(lib.EXAMPLE_DB_PATH)
     // data.append_db_header(header, lib.EXAMPLE_DB_PATH)
 
     //Header serialization, deserialization
@@ -70,15 +72,13 @@ main :: proc() {
     // fmt.println("Recod ByteCode: ", byteCode)
 
 
-
     //Deserializing a serialized field
-    age:u64=30
-    ageBytes:=codec.serialize_u64(age)
-    field:= data.make_new_field("usesadadr_age" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
-    // fmt.println("Field: ", field)
-    serializedField:= codec.serialize_field(field)
-    fmt.println("Field: ", serializedField)
-    codec.deserialize_to_field(serializedField)
-
+    // age:u64=30
+    // ageBytes:=codec.serialize_u64(age)
+    // field:= data.make_new_field("user_age" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
+    // serializedField:= codec.serialize_field(field)
+    // fmt.println("Serialized Field: ", serializedField)
+    // deserializedField:= codec.deserialize_to_field(serializedField)
+    // fmt.println("deserialized Field: ", deserializedField)
 }
 
