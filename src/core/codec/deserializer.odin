@@ -1,5 +1,6 @@
 package codec
 
+import "core:fmt"
 import "core:bytes"
 import "core:slice"
 import lib"../../library"
@@ -85,4 +86,30 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
       offset += 8
 
       return header
+  }
+
+  deserialize_to_field :: proc(b:[]u8) -> lib.Field{
+      field: lib.Field
+
+      offset:= 0
+
+        // grab the first byte
+       copy(field.nameLength[:], b[offset:offset+1])
+       offset += 1
+
+       //Jump to second byte which will ALWAYS be the start of the field's name
+       //Fucking VOODOO
+       firstByteVal:int
+       for v in field.nameLength{
+           firstByteVal = int(v)
+       }
+
+       field.name = b[1:1+firstByteVal]
+       fmt.println(field.name)
+
+       //TODO: Continue
+
+
+
+      return field
   }

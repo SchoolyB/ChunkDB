@@ -1,5 +1,6 @@
 package codec
 
+import "core:fmt"
 import lib"../../library"
 import "core:encoding/endian"
 /*************************************************************************
@@ -104,9 +105,9 @@ get_field_name_prefix :: proc(val: string) ->[2]u8 {
 serialize_field :: proc(f: lib.Field) -> []u8{
     result: [dynamic]u8
 
-    //append the 2 name length bytes prefix
-    nameLenBytes := serialize_u16(f.nameLength)
-    append(&result, nameLenBytes[0], nameLenBytes[1])
+    //append the SINGLE name length byte prefix
+    // nameLenBytes := serialize_u16(f.nameLength)
+    append(&result, f.nameLength[0])
 
      //and the name bytes representation  itself
      append(&result, ..f.name)
@@ -116,11 +117,25 @@ serialize_field :: proc(f: lib.Field) -> []u8{
     append(&result, typeByte[0])
 
      //add 4 value len bytes
-     valLenBytes := serialize_u32(f.valueLength)
-     append(&result, valLenBytes[0], valLenBytes[1], valLenBytes[2], valLenBytes[3])
+     append(&result, f.valueLength[0], f.valueLength[1], f.valueLength[2], f.valueLength[3])
 
     // Add value bytes representation
     append(&result, ..f.value)
+
+    return result[:]
+}
+
+serialize_record ::proc(record: lib.Record, fields: [dynamic]lib.Field)-> []u8 {
+    result: [dynamic]u8
+    serializedField:[]u8
+
+    id:= serialize_u8(record.id)
+    append(&result,  id[0])
+
+    for f in fields {
+        serializedField = serialize_field(f)
+        append(&result, ..serializedField)
+    }
 
     return result[:]
 }
