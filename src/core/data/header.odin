@@ -49,16 +49,15 @@ append_db_header :: proc(h: lib.DatabaseHeader, path: string) {
         fmt.println("Error opening file:", openErr)
         return
     }
+
     defer os.close(file)
 
-    serial := codec.serialize_db_header(h)
-    fmt.println("Serialized data:", serial)
-    fmt.println("Len:", len(serial))
+    serializedHeader := codec.serialize_db_header(h)
 
-    bytes_written, err := os.write(file, serial)
+    bytesWritten, err := os.write(file, serializedHeader)
     if err != nil {
         fmt.println("Write error:", err)
     } else {
-        fmt.println("Bytes written:", bytes_written)
+        fmt.println("Bytes written:", bytesWritten)
     }
 }
