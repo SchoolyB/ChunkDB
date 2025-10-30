@@ -18,4 +18,10 @@ append_field_to_record :: proc(r: ^lib.Record, f: lib.Field) -> ^lib.Record{
     return r
 }
 
+append_fields_to_record :: proc(r: ^lib.Record, fields: [dynamic]lib.Field) -> ^lib.Record{
+    for f in fields{
+        append_field_to_record(r, f)
+    }
+    return r
+}
 
