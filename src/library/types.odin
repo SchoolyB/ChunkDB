@@ -30,6 +30,10 @@ DatabaseHeader :: struct{
     lastModifiedAt: [8]u8
 }
 
+IndexFile:: struct {
+    fieldNameOffets: [dynamic]map[string]int
+}
+
 ChunkHeader  :: struct {
     id: u64,
     type: u64,
@@ -45,16 +49,16 @@ DataChunk :: struct {
 
 // Represents a single field within a record (name-type-value triple)
 Field :: struct {
+    nameLength: [1]u8,
     name: []u8,
-    nameLength: u16,
     type: u8,
+    valueLength: [4]u8, //keeping this 4bytes
     value: []u8,
-    valueLength: u32,
 }
 
 // Represents a complete record with multiple fields
 Record :: struct {
-    id: u64,
+    id: u8,
     fields: [dynamic]Field
 }
 
