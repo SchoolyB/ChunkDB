@@ -95,12 +95,18 @@ Database File (e.g., users.chunky - 100MB pre-allocated)
 │ Data Chunks (fixed 8KB each)        │
 │  - Chunk header (metadata)          │
 │  - Record data or index data        │
-│  - Chunks can be chained            │
 └─────────────────────────────────────┘
 │ Unused Pre-allocated Space          │
 │  - Ready for growth                 │
 └─────────────────────────────────────┘
 ```
+Index file: Used for fast indexing
+Index.chunkDB
+*Stores record name bytecode offset values*
+├─ "user_name" → offset=36
+├─ "user_age"  → offset=53
+├─ "email"     → offset=72
+└─ "status"    → offset=95
 
 **Chunk Types:** FREE, DATA, INDEX, OVERFLOW (for large records)
 
