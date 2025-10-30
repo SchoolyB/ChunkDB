@@ -57,20 +57,34 @@ main :: proc() {
 
 
 
-    //Example of creating a record and appending a field then serializing said record
-    // record: ^lib.Record
-    // record = data.make_new_record("example")
-    // arr:= make([dynamic]lib.Field)
+    //Example of creating a record and appending  2 fields then serializing said record
+    record: ^lib.Record
 
-    // age:u64=30
-    // ageBytes:=codec.serialize_u64(age)
-    // field:= data.make_new_field("user_age" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
-    // append(&arr, field)
-    // record = data.append_field_to_record(record, field)
-    // byteCode:=  codec.serialize_record(record^, arr)
+    record = data.make_new_record("example")
+    arr:= make([dynamic]lib.Field)
+    byteArr:= make([dynamic]u8)
 
-    // fmt.println("Recod ByteCode: ", byteCode)
+    age:u64=30
+    ageBytes:=codec.serialize_u64(age)
+    field:= data.make_new_field("user_age" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
+    anotherField:= data.make_new_field("favorite_number" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
 
+    serializedField, bytesConsumed:= codec.serialize_field(field)
+    append(&arr, field)
+
+    anotherSerializedField, moreBytesConsumed:= codec.serialize_field(anotherField)
+    append(&arr, anotherField)
+
+    fmt.println("Serialized Field and Bytes Consumed: ",serializedField,bytesConsumed)
+
+    record= data.append_fields_to_record(record,arr)
+
+    serializedRecord:=  codec.serialize_record(record^, arr)
+    fmt.println("Serialized Record: ", serializedRecord)
+
+    // //Example of record deserialization
+    deserializedRecord:= codec.deserialize_record(serializedRecord)
+    fmt.println("Deserialized Record: ",deserializedRecord)
 
     //Deserializing a serialized field
     // age:u64=30
@@ -80,5 +94,7 @@ main :: proc() {
     // fmt.println("Serialized Field: ", serializedField)
     // deserializedField:= codec.deserialize_to_field(serializedField)
     // fmt.println("deserialized Field: ", deserializedField)
+
+
 }
 
