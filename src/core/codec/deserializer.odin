@@ -132,3 +132,54 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
 
       return field
   }
+
+  //Shoutout to the intern Claude the G.O.A.T
+  @(require_results)
+  deserialize_record :: proc(b:[]u8) -> lib.Record{
+    record: lib.Record
+    fields:=make([dynamic]lib.Field)
+
+    offset:= 0
+
+    // First byte is always the record ID
+    record.id = b[offset]
+    offset += 1
+
+    //This loop essentiall continues deserializing fields until all bytes are consumed
+    for offset < len(b) {
+
+        //1 byte for name len
+        fieldNameLen:= int(b[offset])
+
+        //Total field size is mostly unknown because 'name' and 'value' can grow or shrink
+        // but nameLen, is always 1 byte, type is always 1 byte and valueLen is always 4 bytes
+        // read value len(4 bytes) after the 'type' byte
+        valueLengthOffset:= offset + 1 + fieldNameLen + 1
+
+        if valueLengthOffset + 4 > len(b) {
+            break
+        }
+
+        //get the value len
+        valueLengthBytes: [4]u8
+        copy(valueLengthBytes[:], b[valueLengthOffset:valueLengthOffset + 4])
+        valueLength := deserialize_to_u32(valueLengthBytes)
+
+        //get total field size
+        fieldSize := 1 + fieldNameLen + 1 + 4 + int(valueLength)
+
+        if offset + fieldSize > len(b) {
+            break
+        }
+
+        f := deserialize_to_field(b[offset:offset + fieldSize])
+        append(&fields, f)
+
+        //move offset to next field
+        offset += fieldSize
+    }
+
+    record.fields = fields
+
+    return record
+  }

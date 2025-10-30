@@ -99,8 +99,9 @@ get_field_name_prefix :: proc(val: string) ->[2]u8 {
     return serialize_u16(result)
 }
 
+//Serializes the passed in field into byte code format. Returns an array of bytes and the number of bytes the field consumed
 @(require_results)
-serialize_field :: proc(f: lib.Field) -> []u8{
+serialize_field :: proc(f: lib.Field) -> ([]u8, int){
     result: [dynamic]u8
     b:u8=---
 
@@ -124,7 +125,7 @@ serialize_field :: proc(f: lib.Field) -> []u8{
     // Add value bytes representation
     append(&result, ..f.value)
 
-    return result[:]
+    return result[:], len(result)
 }
 
 serialize_record ::proc(record: lib.Record, fields: [dynamic]lib.Field)-> []u8 {
@@ -135,7 +136,7 @@ serialize_record ::proc(record: lib.Record, fields: [dynamic]lib.Field)-> []u8 {
     append(&result,  id[0])
 
     for f in fields {
-        serializedField = serialize_field(f)
+        serializedField, _ = serialize_field(f)
         append(&result, ..serializedField)
     }
 
