@@ -20,6 +20,8 @@ package library
 * File Description: Contains MOST constants used throughout codebase
 *************************************************************************/
 EXAMPLE_DB_PATH :: "./example.chunky"
+DB_FILE_EXTENSION :: ".chunkdb"
+INDEX_EXTENSION :: ".chunky"
 
 //DB header shit
 MAGIC_NUMBER :string: "CHUNKDB_V1"
