@@ -32,11 +32,11 @@ make_new_db_header ::proc () -> lib.DatabaseHeader {
     currentTime:= time.now()
     currentNanoSec:= transmute(u64)currentTime._nsec
 
-    header.magicNumber = codec.serialize_string(lib.MAGIC_NUMBER)
-    header.version = codec.serialize_u32(lib.VERSION)
-    header.totalCapacity = codec.serialize_u32(lib.DEFAULT_DB_CAPACITY)
-    header.createdAt = codec.serialize_u64(currentNanoSec)
-    header.lastModifiedAt = codec.serialize_u64(currentNanoSec)
+    header.magicNumber = header.magicNumber
+    header.version = lib.VERSION
+    header.totalCapacity = lib.DEFAULT_DB_CAPACITY
+    header.createdAt = currentNanoSec
+    header.lastModifiedAt = currentNanoSec
     //TODO: Once allocation stuff is done continue making header
 
     return header

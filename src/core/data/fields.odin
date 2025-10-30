@@ -26,10 +26,10 @@ import lib"../../library"
 
 make_new_field :: proc(name: string, type: u8, value: []u8) -> lib.Field {
     return lib.Field{
-        name = transmute([]u8)name,
-        nameLength = transmute([1]u8)u8(len(name)),
+        name =name,
+        nameLength = u8(len(name)),
         type = type,
         value = value,
-        valueLength = transmute([4]u8)u32(len(value))
+        valueLength = u32(len(value))
     }
 }
