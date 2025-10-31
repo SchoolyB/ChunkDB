@@ -36,14 +36,18 @@ IndexFile:: struct {
 
 ChunkHeader  :: struct {
     id: u64,
-    type: u64,
+    sizePreAllocated: u32,
     usedBytes: u16,
-    nextChunk: u64
+    // nextChunk: u64
+    nextChunk: ^DataChunk
+}
+
+ChunkDirectoy :: struct {
+    chunks:[dynamic]DataChunk
 }
 
 DataChunk :: struct {
     header: ChunkHeader,
-    sizePreAllocated: u8,
     records: [dynamic]Record
 }
 
