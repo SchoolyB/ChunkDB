@@ -91,7 +91,7 @@ serialize_data_chunk :: proc(chunk: lib.DataChunk)->[]u8{
     id:= serialize_u64(chunk.header.id)
     append(&result, ..id[:])
 
-    size:= serialize_u32(lib.DEFAULT_CHUNK_SIZE_ALLOCATION)
+    size:= serialize_u32(lib.DEFAULT_CHUNK_ALLOCATION_SIZE)
     if chunk.header.sizePreAllocated == 0{
         append(&result, ..size[:])
     }else{
