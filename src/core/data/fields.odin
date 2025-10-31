@@ -24,6 +24,7 @@ import lib"../../library"
 *************************************************************************/
 
 
+@(require_results)
 make_new_field :: proc(name: string, type: u8, value: []u8) -> lib.Field {
     return lib.Field{
         name =name,

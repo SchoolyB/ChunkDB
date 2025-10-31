@@ -23,6 +23,7 @@ import lib"../../library"
 * File Description: Contains logic for creating and interacting with Chunks
 *************************************************************************/
 
+@(require_results)
 make_new_chunk_directory :: proc() -> lib.ChunkDirectoy{
     dir: lib.ChunkDirectoy
     dir.chunks = make([dynamic]lib.DataChunk)
@@ -31,6 +32,7 @@ make_new_chunk_directory :: proc() -> lib.ChunkDirectoy{
 }
 
 
+@(require_results)
 make_new_data_chunk :: proc(previousChunk: ^lib.DataChunk) -> (lib.DataChunk) {
     chunk: lib.DataChunk
 
@@ -43,12 +45,14 @@ make_new_data_chunk :: proc(previousChunk: ^lib.DataChunk) -> (lib.DataChunk) {
     return chunk
 }
 
+@(require_results)
 append_record_to_data_chunk ::proc(c: ^lib.DataChunk, r: lib.Record)-> lib.DataChunk{
     append(&c.records, r)
 
     return c
 }
 
+@(require_results)
 append_records_to_data_chunk :: proc(c: ^lib.DataChunk, records:[dynamic]lib.Record) -> lib.DataChunk{
     for r in records{
         append_record_to_data_chunk(c.records, r)

@@ -26,6 +26,7 @@ import lib"../../library"
 * File Description: Contains logic for creating and interacting with ChunkDB file headers
 *************************************************************************/
 
+@(require_results)
 make_new_db_header ::proc () -> lib.DatabaseHeader {
     header:lib.DatabaseHeader
 

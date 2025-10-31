@@ -25,7 +25,6 @@ import lib"../../library"
 *
 * File Description: Contains logic for ChunkDB data(bytecode) deserialization.
 *************************************************************************/
-
 @(require_results)
 deserialize_to_u64 :: proc(val: [8]u8) -> u64{
     return transmute(u64)val
@@ -56,10 +55,11 @@ deserialize_to_string :: proc(val: []u8) -> string{
     return transmute(string)val
 }
 
+@(require_results)
 deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
       header: lib.DatabaseHeader
 
-    // min size of the file header will be 58: 10 + 4 + 4 + 8 + 8 + sizePreAllocated + usedBytes
+      // min size of the file header will be 58: 10 + 4 + 4 + 8 + 8 + sizePreAllocated + usedBytes
       if len(b) < 34 { //TODO: Set this to 34 for the time being until I work on allocations. When done set to 58
           return header
       }
@@ -96,9 +96,10 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
       offset += 8
 
       return header
-  }
+}
 
-  //Fucking voodoo man
+
+  @(require_results) //Fucking voodoo man
   deserialize_to_field :: proc(b:[]u8) -> lib.Field{
       field: lib.Field
 

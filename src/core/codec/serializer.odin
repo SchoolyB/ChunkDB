@@ -23,14 +23,6 @@ import "core:encoding/endian"
 *
 * File Description: Contains logic for serializing in memory data into valid ChunkDB data(bytecode)
 *************************************************************************/
-
-// ????
-serialize_u16_big_E :: proc(val: u16) -> [2]u8{
-    result:[2]u8
-    endian.put_u16(result[:], .Big, val)
-    return result
-}
-
 @(require_results)
 serialize_u64 :: proc(val: u64) -> [8]u8{
     return transmute([8]u8)val
@@ -61,6 +53,7 @@ serialize_string:: proc(val: string) -> []u8{
     return transmute([]u8)val
 }
 
+@(require_results)
 serialize_db_header :: proc(header: lib.DatabaseHeader ) -> []u8{
     result: [dynamic]u8
     b: u8 = ---
@@ -91,7 +84,7 @@ serialize_db_header :: proc(header: lib.DatabaseHeader ) -> []u8{
     return result[:]
 }
 
-
+@(require_results)
 serialize_data_chunk :: proc(chunk: lib.DataChunk)->[]u8{
     result: [dynamic]u8
 
@@ -118,7 +111,7 @@ serialize_data_chunk :: proc(chunk: lib.DataChunk)->[]u8{
     return result[:]
 }
 
-// serialize_record ::proc(record: lib.Record, fields: [dynamic]lib.Field)-> []u8 {
+@(require_results)
 serialize_record ::proc(record: lib.Record)-> []u8 {
     result: [dynamic]u8
     serializedField:[]u8
