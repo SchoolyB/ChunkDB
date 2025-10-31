@@ -99,6 +99,10 @@ serialize_data_chunk :: proc(chunk: lib.DataChunk)->[]u8{
         append(&result, ..size[:])
     }
 
+    //This helps make deserializtion easier trust me
+    recordCount := serialize_u32(u32(len(chunk.records)))
+    append(&result, ..recordCount[:])
+
     record:lib.Record
     for r in chunk.records{
         serializedRecord := serialize_record(r)
@@ -118,6 +122,10 @@ serialize_record ::proc(record: lib.Record)-> []u8 {
 
     id:= serialize_u8(record.id)
     append(&result,  id[0])
+
+    // Add field count to make deserialization easier
+    fieldCount := serialize_u32(u32(len(record.fields)))
+    append(&result, ..fieldCount[:])
 
     for f in record.fields {
         serializedField, _ = serialize_field(f)

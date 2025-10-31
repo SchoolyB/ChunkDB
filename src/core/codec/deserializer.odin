@@ -98,9 +98,117 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
       return header
 }
 
+//This big beefy MF was slapped together by the intern.
+@(require_results)
+deserialize_data_chunk :: proc(b:[]u8) -> lib.DataChunk {
+    chunk: lib.DataChunk
+    records:= make([dynamic]lib.Record)
 
-  @(require_results) //Fucking voodoo man
-  deserialize_to_field :: proc(b:[]u8) -> lib.Field{
+    // Minimum size: 8 (id) + 4 (size) + 4 (record count) + 2 (usedBytes) = 18 bytes
+    if len(b) < 18 {
+        return chunk
+    }
+
+    offset := 0
+
+    //first 8 bytes are the chunk ID
+    idBytes: [8]u8
+    copy(idBytes[:], b[offset:offset+8])
+    chunk.header.id = deserialize_to_u64(idBytes)
+    offset += size_of(idBytes)
+
+    //next 4 bytes are size pre-allocated
+    sizeBytes: [4]u8
+    copy(sizeBytes[:], b[offset:offset+4])
+    chunk.header.sizePreAllocated = deserialize_to_u32(sizeBytes)
+    offset += size_of(sizeBytes)
+
+    //next 4 bytes are the record count
+    recordCountBytes: [4]u8
+    copy(recordCountBytes[:], b[offset:offset+4])
+    recordCount := deserialize_to_u32(recordCountBytes)
+    offset += size_of(recordCountBytes)
+
+    // Last 2 bytes are usedBytes - need to read them from the end
+    usedBytesBytes: [2]u8
+    copy(usedBytesBytes[:], b[len(b)-2:len(b)])
+    chunk.header.usedBytes = deserialize_to_u16(usedBytesBytes)
+
+    recordsBytes := b[offset:len(b)-2]
+
+    // Deserialize the exact number of records specified by recordCount
+    recordOffset := 0
+    for i in 0..<int(recordCount) {
+        if recordOffset >= len(recordsBytes) {
+            break
+        }
+
+        // Read record ID (1 byte)
+        recordStart := recordOffset
+        recordOffset += 1
+
+        // Read field count (4 bytes)
+        if recordOffset + 4 > len(recordsBytes) {
+            break
+        }
+        fieldCountBytes: [4]u8
+        copy(fieldCountBytes[:], recordsBytes[recordOffset:recordOffset+4])
+        fieldCount := deserialize_to_u32(fieldCountBytes)
+        recordOffset += 4
+
+        // Scan through the exact number of fields to find record end
+        for j in 0..<int(fieldCount) {
+            if recordOffset >= len(recordsBytes) {
+                break
+            }
+
+            // Read field name length
+            fieldNameLen := int(recordsBytes[recordOffset])
+            recordOffset += 1
+
+            // Skip field name
+            if recordOffset + fieldNameLen > len(recordsBytes) {
+                break
+            }
+            recordOffset += fieldNameLen
+
+            // Skip type byte
+            if recordOffset >= len(recordsBytes) {
+                break
+            }
+            recordOffset += 1
+
+            // Read and skip value length and value
+            if recordOffset + 4 > len(recordsBytes) {
+                break
+            }
+            valueLengthBytes: [4]u8
+            copy(valueLengthBytes[:], recordsBytes[recordOffset:recordOffset+4])
+            valueLength := deserialize_to_u32(valueLengthBytes)
+            recordOffset += 4
+
+            // Skip value
+            if recordOffset + int(valueLength) > len(recordsBytes) {
+                break
+            }
+            recordOffset += int(valueLength)
+        }
+
+        // /deserialize the record
+        recordBytes := recordsBytes[recordStart:recordOffset]
+        if len(recordBytes) > 0 {
+            record := deserialize_record(recordBytes)
+            append(&records, record)
+        }
+    }
+
+    chunk.records = records
+
+    return chunk
+}
+
+@(require_results) //Fucking voodoo man
+deserialize_to_field :: proc(b:[]u8) -> lib.Field{
       field: lib.Field
 
       offset:= 0
@@ -132,11 +240,11 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
         field.value = valueBytes
 
       return field
-  }
+}
 
-  //Shoutout to the intern Claude the G.O.A.T
-  @(require_results)
-  deserialize_record :: proc(b:[]u8) -> lib.Record{
+//Shoutout to the intern Claude the G.O.A.T
+@(require_results)
+deserialize_record :: proc(b:[]u8) -> lib.Record{
     record: lib.Record
     fields:=make([dynamic]lib.Field)
 
@@ -146,8 +254,20 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
     record.id = b[offset]
     offset += 1
 
-    //This loop essentiall continues deserializing fields until all bytes are consumed
-    for offset < len(b) {
+    // Next 4 bytes are the field count
+    if offset + 4 > len(b) {
+        return record
+    }
+    fieldCountBytes: [4]u8
+    copy(fieldCountBytes[:], b[offset:offset+4])
+    fieldCount := deserialize_to_u32(fieldCountBytes)
+    offset += 4
+
+    // Deserialize the exact number of fields specified by fieldCount
+    for i in 0..<int(fieldCount) {
+        if offset >= len(b) {
+            break
+        }
 
         //1 byte for name len
         fieldNameLen:= int(b[offset])
@@ -183,4 +303,4 @@ deserialize_db_header :: proc(b: []u8) -> lib.DatabaseHeader {
     record.fields = fields
 
     return record
-  }
+}
