@@ -39,26 +39,23 @@ make_new_data_chunk :: proc(previousChunk: ^lib.DataChunk) -> (lib.DataChunk) {
     chunk.header.id = 0 //TODO: need to get accurate chunk count
     chunk.header.nextChunk = previousChunk
     chunk.header.usedBytes = 0
-    chunk.header.type = .DATA_CHUNK
     chunk.records = make([dynamic]lib.Record)
 
     return chunk
 }
 
-@(require_results)
-append_record_to_data_chunk ::proc(c: ^lib.DataChunk, r: lib.Record)-> lib.DataChunk{
+append_record_to_data_chunk ::proc(c: ^lib.DataChunk, r: lib.Record)-> ^lib.DataChunk{
     append(&c.records, r)
 
     return c
 }
 
-@(require_results)
-append_records_to_data_chunk :: proc(c: ^lib.DataChunk, records:[dynamic]lib.Record) -> lib.DataChunk{
+append_records_to_data_chunk :: proc(c: ^lib.DataChunk, records:[dynamic]lib.Record) -> ^lib.DataChunk{
     for r in records{
-        append_record_to_data_chunk(c.records, r)
+        append_record_to_data_chunk(c, r)
     }
 
-    return r
+    return c
 }
 
 // get_previous_chunk :: proc(b:[]u8) ->^lib.Chunk{
