@@ -91,12 +91,47 @@ serialize_db_header :: proc(header: lib.DatabaseHeader ) -> []u8{
     return result[:]
 }
 
-//Helper that gets the prefix of a field name and returns the 2 byte representation
-// TODO: Move me somewhere else???
-@(require_results)
-get_field_name_prefix :: proc(val: string) ->[2]u8 {
-    result := u16(len(val))
-    return serialize_u16(result)
+
+serialize_data_chunk :: proc(chunk: lib.DataChunk)->[]u8{
+    result: [dynamic]u8
+
+    id:= serialize_u64(chunk.header.id)
+    append(&result, ..id[:])
+
+    size:= serialize_u32(lib.DEFAULT_CHUNK_SIZE_ALLOCATION)
+    if chunk.header.sizePreAllocated == 0{
+        append(&result, ..size[:])
+    }else{
+        size = serialize_u32(chunk.header.sizePreAllocated)
+        append(&result, ..size[:])
+    }
+
+    record:lib.Record
+    for r in chunk.records{
+        serializedRecord := serialize_record(r)
+        append(&result, ..serializedRecord[:])
+    }
+
+    usedBytes:=serialize_u16(chunk.header.usedBytes)
+    append(&result, ..usedBytes[:])
+
+    return result[:]
+}
+
+// serialize_record ::proc(record: lib.Record, fields: [dynamic]lib.Field)-> []u8 {
+serialize_record ::proc(record: lib.Record)-> []u8 {
+    result: [dynamic]u8
+    serializedField:[]u8
+
+    id:= serialize_u8(record.id)
+    append(&result,  id[0])
+
+    for f in record.fields {
+        serializedField, _ = serialize_field(f)
+        append(&result, ..serializedField)
+    }
+
+    return result[:]
 }
 
 //Serializes the passed in field into byte code format. Returns an array of bytes and the number of bytes the field consumed
@@ -128,17 +163,10 @@ serialize_field :: proc(f: lib.Field) -> ([]u8, int){
     return result[:], len(result)
 }
 
-serialize_record ::proc(record: lib.Record, fields: [dynamic]lib.Field)-> []u8 {
-    result: [dynamic]u8
-    serializedField:[]u8
-
-    id:= serialize_u8(record.id)
-    append(&result,  id[0])
-
-    for f in fields {
-        serializedField, _ = serialize_field(f)
-        append(&result, ..serializedField)
-    }
-
-    return result[:]
+//Helper that gets the prefix of a field name and returns the 2 byte representation
+// TODO: Move me somewhere else???
+@(require_results)
+get_field_name_prefix :: proc(val: string) ->[2]u8 {
+    result := u16(len(val))
+    return serialize_u16(result)
 }
