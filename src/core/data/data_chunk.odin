@@ -57,8 +57,3 @@ append_records_to_data_chunk :: proc(c: ^lib.DataChunk, records:[dynamic]lib.Rec
 
     return c
 }
-
-// get_previous_chunk :: proc(b:[]u8) ->^lib.Chunk{
-
-
-// }

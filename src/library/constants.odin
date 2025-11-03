@@ -24,10 +24,9 @@ DB_FILE_EXTENSION :: ".chunkdb"
 INDEX_EXTENSION :: ".chunky"
 
 //DB header shit
-// MAGIC_NUMBER :[10]u8: "CHUNKDB_V1"
 MAGIC_NUMBER :[10]u8: {67, 72, 85, 78, 75, 68, 66, 95, 86, 49}
 VERSION :u32: 1
-DEFAULT_DB_CAPACITY :u32: 512_000 //500kb this includes pre-allocated chunks
+DEFAULT_DB_CAPACITY :u32: 51200 //50kb this includes pre-allocated chunks
 DEFAULT_CHUNK_ALLOCATION_SIZE :u32: 8000 //about 8kb
 MAX_DB_CAPACITY :u32: 5_242_880 //5mb. User cannot allocate anymore
 

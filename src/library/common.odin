@@ -34,3 +34,29 @@ make_db_file :: proc(path: string) -> bool {
     fmt.println("File created successfully")
     return true
 }
+
+// Defaults to creating a .chunky file of 50kb
+make_db_with_explicit_size :: proc(path: string, size:u32= DEFAULT_DB_CAPACITY){
+    file, openError := os.open(path, os.O_CREATE | os.O_WRONLY | os.O_TRUNC, 0o644)
+    if openError != os.ERROR_NONE {
+        fmt.println("Error opening file:", openError)
+        return
+    }
+    defer os.close(file)
+
+    // Seek to size-1 and write a byte
+    _, seekError := os.seek(file, i64(size - 1), os.SEEK_SET)
+    if seekError != os.ERROR_NONE {
+        fmt.println("Error seeking:", seekError)
+        return
+    }
+
+    byteToWrite: []u8 = {0}
+    _, writeError := os.write(file, byteToWrite)
+    if writeError != os.ERROR_NONE {
+        fmt.println("Error writing:", writeError)
+        return
+    }
+
+    fmt.println("Successfully made DB of size: ", size)
+}
