@@ -58,33 +58,34 @@ main :: proc() {
 
 
     //Example of creating a record and appending  2 fields then serializing said record
-    record: ^lib.Record
+    // record: ^lib.Record
 
-    record = data.make_new_record("example")
-    arr:= make([dynamic]lib.Field)
-    byteArr:= make([dynamic]u8)
+    // record = data.make_new_record("example")
+    // arr:= make([dynamic]lib.Field)
+    // byteArr:= make([dynamic]u8)
 
-    age:u64=30
-    ageBytes:=codec.serialize_u64(age)
-    field:= data.make_new_field("user_age" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
-    anotherField:= data.make_new_field("favorite_number" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
+    // age:u64=30
+    // ageBytes:=codec.serialize_u64(age)
+    // field:= data.make_new_field("user_age" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
+    // anotherField:= data.make_new_field("favorite_number" ,lib.CORE_TYPE_INTEGER, ageBytes[:])
 
-    serializedField, bytesConsumed:= codec.serialize_field(field)
-    append(&arr, field)
+    // serializedField, bytesConsumed:= codec.serialize_field(field)
+    // append(&arr, field)
 
-    anotherSerializedField, moreBytesConsumed:= codec.serialize_field(anotherField)
-    append(&arr, anotherField)
+    // anotherSerializedField, moreBytesConsumed:= codec.serialize_field(anotherField)
+    // append(&arr, anotherField)
 
-    fmt.println("Serialized Field and Bytes Consumed: ",serializedField,bytesConsumed)
+    // fmt.println("Serialized Field and Bytes Consumed: ",serializedField,bytesConsumed)
 
-    record= data.append_fields_to_record(record,arr)
+    // record= data.append_fields_to_record(record,arr)
 
-    serializedRecord:=  codec.serialize_record(record^, arr)
-    fmt.println("Serialized Record: ", serializedRecord)
+    // serializedRecord:=  codec.serialize_record(record^, arr)
+    // fmt.println("Serialized Record: ", serializedRecord)
 
-    // //Example of record deserialization
-    deserializedRecord:= codec.deserialize_record(serializedRecord)
-    fmt.println("Deserialized Record: ",deserializedRecord)
+    // // //Example of record deserialization
+    // deserializedRecord:= codec.deserialize_record(serializedRecord)
+    // fmt.println("Deserialized Record: ",deserializedRecord)
+
 
     //Deserializing a serialized field
     // age:u64=30
@@ -95,6 +96,7 @@ main :: proc() {
     // deserializedField:= codec.deserialize_to_field(serializedField)
     // fmt.println("deserialized Field: ", deserializedField)
 
+    lib.make_db_with_explicit_size(lib.EXAMPLE_DB_PATH)
 
 }
 
